@@ -3,7 +3,7 @@
 
 import cv2
 import numpy as np
-import cPickle as pkl
+import pickle as pkl
 
 from skimage.measure import compare_ssim
 

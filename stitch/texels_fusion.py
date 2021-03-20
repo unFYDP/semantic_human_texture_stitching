@@ -5,7 +5,7 @@ import gco
 import cv2
 import os
 import numpy as np
-import cPickle as pkl
+import pickle as pkl
 
 from scipy import signal
 from skimage import color

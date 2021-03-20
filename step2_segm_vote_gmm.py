@@ -6,7 +6,7 @@ import os
 import gco
 import argparse
 import numpy as np
-import cPickle as pkl
+import pickle as pkl
 
 from glob import glob
 from scipy import signal
