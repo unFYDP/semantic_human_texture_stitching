@@ -31,7 +31,7 @@ class Isomapper():
         if visible_faces is not None:
             self.rn_vis.set(f=self.f[visible_faces])
             if inpaint:
-                visible = cv2.erode(self.rn_vis.r, np.ones((self.tex_res / 100, self.tex_res / 100)))
+                visible = cv2.erode(self.rn_vis.r, np.ones((self.tex_res // 100, self.tex_res // 100)))
 
                 if inpaint_segments is None:
                     tex = np.atleast_3d(self.iso_mask) * cv2.inpaint(np.uint8(tex * 255), np.uint8((1 - visible) * 255),

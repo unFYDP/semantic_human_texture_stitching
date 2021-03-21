@@ -16,7 +16,7 @@ from opendr.topology import get_faces_per_edge
 
 class Stitcher:
 
-    def __init__(self, seams, tex_res, mask, edge_idx_file='assets/basicModel_edge_idx_1000.pkl'):
+    def __init__(self, seams, tex_res, mask, edge_idx_file='assets/basicModel_edge_idx_1000_.pkl'):
         self.tex_res = tex_res
         self.seams = seams
         self.edge_idx = pkl.load(open(edge_idx_file, 'rb'))
