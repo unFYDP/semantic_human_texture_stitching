@@ -80,7 +80,7 @@ def main(unwrap_dir, segm_out_file, gmm_out_file):
     pairwise = np.ascontiguousarray(LABEL_COMP)
 
     seams = np.load('assets/basicModel_seams.npy')
-    edge_idx = pkl.load(open('assets/basicModel_edge_idx_1000.pkl', 'rb'))
+    edge_idx = pkl.load(open('assets/basicModel_edge_idx_1000_.pkl', 'rb'))
 
     dr_v = signal.convolve2d(iso_mask, [[-1, 1]])[:, 1:]
     dr_h = signal.convolve2d(iso_mask, [[-1], [1]])[1:, :]
