@@ -1,11 +1,8 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
-
 import cv2
 import os
 import argparse
 import numpy as np
-import cPickle as pkl
+import pickle as pkl
 
 from tqdm import tqdm
 from glob import glob

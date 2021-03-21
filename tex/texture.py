@@ -1,14 +1,11 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
-
 import cv2
 import numpy as np
-import cPickle as pkl
+import pickle as pkl
 
 from skimage.measure import compare_ssim
 
 from stitch.texels_fusion import Stitcher
-from iso import Isomapper
+from .iso import Isomapper
 from util.visibility import VisibilityRenderer
 from util.labels import LABELS_REDUCED, to_ids
 

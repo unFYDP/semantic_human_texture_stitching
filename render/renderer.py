@@ -1,6 +1,3 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8 -*-
-
 import platform
 import numpy as np
 
