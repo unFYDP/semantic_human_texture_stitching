@@ -43,7 +43,8 @@ def main(data_file, frame_dir, segm_dir, out_file, num_iter):
 
     isos, vises, iso_segms = [], [], []
 
-    for i, (v, frame_file, segm_file) in enumerate(tqdm(zip(verts, frame_files, segm_files))):
+    print('Unwrapping inputs...')
+    for i, (v, frame_file, segm_file) in enumerate(zip(tqdm(verts), frame_files, segm_files)):
         frame = cv2.imread(frame_file) / 255.
         segm = read_segmentation(segm_file) / 255.
         mask = np.float32(np.any(segm > 0, axis=-1))
@@ -149,6 +150,7 @@ def main(data_file, frame_dir, segm_dir, out_file, num_iter):
 
     tex, _ = texture.add_iso(texture_agg, visibility_agg, np.zeros_like(visibility_agg), inpaint=False)
 
+    print('Aggregating texture...')
     for i in trange(num_iter):
         rl = np.random.choice(num_labels)
         texture_agg, labels = texture.add_iso(isos[rl], vises[rl], rl, inpaint=i == (num_iter-1))
