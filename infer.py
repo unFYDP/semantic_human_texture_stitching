@@ -83,9 +83,9 @@ def main(data_file, frame_dir, segm_dir, out_file, num_iter):
                 voting[where, i] += tex_weights[where]
                 gmm_pixels[color_id].extend(frame[where].tolist())
 
-    for color_id in LABELS_REDUCED:
+    print('Fitting GMMs...')
+    for color_id in tqdm(LABELS_REDUCED):
         if gmm_pixels[color_id]:
-            print('GMM fit {}...'.format(color_id))
             gmms[color_id].fit(np.array(gmm_pixels[color_id]))
 
     for i, color_id in enumerate(LABELS_REDUCED):
