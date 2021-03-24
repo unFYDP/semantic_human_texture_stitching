@@ -50,26 +50,13 @@ def main(data_file, frame_dir, segm_dir, out_file, num_iter):
 
         camera.set(v=v)
 
-        # id = os.path.splitext(os.path.basename(frame_file))[0]
-
         vis, iso, iso_segm = texture.get_data(frame, camera, mask, segm)
 
-        # vises.append(np.uint8(vis * 255))
-        # isos.append(np.uint8(iso * 255))
-        # iso_segms.append(np.uint8(iso_segm * 255))
         vises.append(vis)
         isos.append(iso)
-        iso_segms.append(iso_segm)
-
-        # cv2.imwrite('{}/{}_unwrap.jpg'.format(out, id), np.uint8(iso * 255))
-        # cv2.imwrite('{}/{}_visibility.jpg'.format(out, id), np.uint8(vis * 255))
-        # cv2.imwrite('{}/{}_segm.png'.format(out, id), np.uint8(iso_segm[:, :, ::-1] * 255))
+        iso_segms.append(np.uint8(iso_segm * 255))
 
     # Step 2: Segm vote gmm
-
-    # iso_files = np.array(sorted(glob(os.path.join(unwrap_dir, '*_unwrap.jpg'))))
-    # segm_files = np.array(sorted(glob(os.path.join(unwrap_dir, '*_segm.png'))))
-    # vis_files = np.array(sorted(glob(os.path.join(unwrap_dir, '*_visibility.jpg'))))
 
     iso_mask = cv2.imread('assets/tex_mask_1000.png', flags=cv2.IMREAD_GRAYSCALE) / 255.
     iso_mask = cv2.resize(iso_mask, (1000, 1000), interpolation=cv2.INTER_NEAREST)
@@ -92,22 +79,8 @@ def main(data_file, frame_dir, segm_dir, out_file, num_iter):
         for i, color_id in enumerate(LABELS_REDUCED):
             if color_id != 'Unseen' and color_id != 'BG':
                 where = np.all(tex_segm == LABELS_REDUCED[color_id], axis=2)
-                voting[where, i] += tex_weights[where, 0]
+                voting[where, i] += tex_weights[where]
                 gmm_pixels[color_id].extend(frame[where].tolist())
-
-    # for frame_file, segm_file, vis_file in zip(iso_files, segm_files, vis_files):
-    #     print('extract from {}...'.format(os.path.basename(frame_file)))
-
-    #     frame = cv2.cvtColor(cv2.imread(frame_file), cv2.COLOR_BGR2HSV) / 255.
-    #     tex_segm = read_segmentation(segm_file)
-    #     tex_weights = 1 - cv2.imread(vis_file) / 255.
-    #     tex_weights = np.sqrt(tex_weights)
-
-    #     for i, color_id in enumerate(LABELS_REDUCED):
-    #         if color_id != 'Unseen' and color_id != 'BG':
-    #             where = np.all(tex_segm == LABELS_REDUCED[color_id], axis=2)
-    #             voting[where, i] += tex_weights[where, 0]
-    #             gmm_pixels[color_id].extend(frame[where].tolist())
 
     for color_id in LABELS_REDUCED:
         if gmm_pixels[color_id]:
@@ -121,7 +94,6 @@ def main(data_file, frame_dir, segm_dir, out_file, num_iter):
     voting[iso_mask == 0] = 0
     voting[iso_mask == 0, 0] = 1
 
-    # unaries = np.ascontiguousarray((1 - voting / len(iso_files)) * 10)
     unaries = np.ascontiguousarray((1 - voting / len(isos)) * 10)
     pairwise = np.ascontiguousarray(LABEL_COMP)
 
@@ -162,45 +134,23 @@ def main(data_file, frame_dir, segm_dir, out_file, num_iter):
     for i, color_id in enumerate(LABELS_REDUCED):
         segm_colors[labels == i] = LABELS_REDUCED[color_id]
 
-    # cv2.imwrite('{}'.format(segm_out_file), segm_colors[:, :, ::-1])
-    # pkl.dump(gmms, open(gmm_out_file, 'wb'))
-
     # Step 3: Stitch texture
-
-    # iso_files = np.array(sorted(glob(os.path.join(unwrap_dir, '*_unwrap.jpg'))))
-    # vis_files = np.array(sorted(glob(os.path.join(unwrap_dir, '*_visibility.jpg'))))
 
     seams = np.load('assets/basicModel_seams.npy')
     mask = cv2.imread('assets/tex_mask_1000.png', flags=cv2.IMREAD_GRAYSCALE) / 255.
 
-    # segm_template = read_segmentation(segm_template_file)
-    # gmm = pkl.load(open(gmm_file, 'rb'))
     segm_template = read_segmentation(segm_colors)
 
-    # num_labels = len(iso_files)
-    # texture = Texture(1000, seams, mask, segm_template, gmm)
     num_labels = len(isos)
     texture = Texture(1000, seams, mask, segm_template, gmms)
 
-    # isos = []
-    # visibilities = []
-    # for iso_file, vis_file in zip(iso_files, vis_files):
-    #     print('reading file {}...'.format(os.path.basename(iso_file)))
-    #     iso = cv2.imread(iso_file) / 255.
-    #     vis = cv2.imread(vis_file, flags=cv2.IMREAD_GRAYSCALE) / 255.
-
-    #     isos.append(iso)
-    #     visibilities.append(vis)
-
     texture_agg = isos[0]
-    # visibility_agg = np.array(visibilities[0])
     visibility_agg = np.array(vises[0])
 
     tex, _ = texture.add_iso(texture_agg, visibility_agg, np.zeros_like(visibility_agg), inpaint=False)
 
     for i in trange(num_iter):
         rl = np.random.choice(num_labels)
-        # texture_agg, labels = texture.add_iso(isos[rl], visibilities[rl], rl, inpaint=i == (num_iter-1))
         texture_agg, labels = texture.add_iso(isos[rl], vises[rl], rl, inpaint=i == (num_iter-1))
 
     print('saving {}...'.format(os.path.basename(out_file)))
