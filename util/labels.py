@@ -70,8 +70,11 @@ LABEL_COMP = np.ones(len(LABELS_REDUCED)) - np.eye(len(LABELS_REDUCED))
 LABEL_COMP[0, 0] = 1.
 
 
-def read_segmentation(file):
-    segm = cv2.imread(file)[:, :, ::-1]
+def read_segmentation(file_or_val):
+    if isinstance(file_or_val, str):
+        segm = cv2.imread(file_or_val)[:, :, ::-1]
+    else:
+        segm = file_or_val[:, :, :]
 
     segm[np.all(segm == LABELS_FULL['Sunglasses'], axis=2)] = LABELS_REDUCED['Face']
     segm[np.all(segm == LABELS_FULL['LeftArm'], axis=2)] = LABELS_REDUCED['Arms']
@@ -82,6 +85,7 @@ def read_segmentation(file):
     segm[np.all(segm == LABELS_FULL['RightShoe'], axis=2)] = LABELS_REDUCED['Shoes']
 
     return segm
+
 
 def to_ids(segm):
     ids = np.zeros(segm.shape[:2], dtype=np.uint8)
